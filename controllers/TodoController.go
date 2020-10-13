@@ -27,6 +27,7 @@ func GetAllTodos(ctx *fiber.Ctx) {
 	collection := mgm.Coll(&models.Todo{})
 	todos := []models.Todo{}
 	err := collection.SimpleFind(&todos, bson.D{})
+
 	if err != nil {
 		ctx.Status(500).JSON(fiber.Map{
 			"ok":    false,
@@ -34,9 +35,72 @@ func GetAllTodos(ctx *fiber.Ctx) {
 		})
 	}
 
+	ctx.Status(200).JSON(fiber.Map{
+		"ok":    true,
+		"todos": todos,
+	})
+
 }
 
-// GetOneTodo - GET /api/todos/:id
-func GetOneTodo(ctx *fiber.Ctx) {
+// GetTodoByID - GET /api/todos/:id
+// Creates a pointer to our Todo struct
+// and use that pointer to define the structure
+// of our collection
+func GetTodoByID(ctx *fiber.Ctx) {
+
+	id := ctx.Params("id")
+
+	todo := &models.Todo{}
+	collection := mgm.Coll(todo)
+
+	err := collection.FindByID(id, todo)
+
+	if err != nil {
+		ctx.Status(500).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
+		})
+	}
+}
+
+// CreateTodo - POST /api/todos
+func CreateTodo(ctx *fiber.Ctx) {
+
+	params := new(struct {
+		Title       string
+		Description string
+	})
+
+	ctx.BodyParser(&params)
+
+	if len(params.Title) == 0 || len(params.Description) == 0 {
+		ctx.Status(400).JSON(fiber.Map{
+			"ok":    false,
+			"error": "Empty fields",
+		})
+		return
+	}
+
+	todo := &models.Todo{
+		Title:       params.Title,
+		Description: params.Description,
+	}
+
+	todo = models.CreateTodo(todo.Title, todo.Description)
+	err := mgm.Coll(todo).Create(todo)
+
+	if err != nil {
+		ctx.Status(500).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	ctx.Status(201).JSON(fiber.Map{
+		"ok":   true,
+		"todo": todo,
+	})
 
 }
