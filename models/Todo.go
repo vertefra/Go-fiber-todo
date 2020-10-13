@@ -16,6 +16,9 @@ type Todo struct {
 // CreateTodo is a wrapper function that creates a newTodo Object.
 // It returns a Todo pointer to a Todo struct that contains all
 // all the specified data
+
+// & indicates that the returning value is the memory address for this
+// created Todo
 func CreateTodo(title, description string) *Todo {
 	return &Todo{
 		Title:       title,
