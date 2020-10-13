@@ -102,5 +102,35 @@ func CreateTodo(ctx *fiber.Ctx) {
 		"ok":   true,
 		"todo": todo,
 	})
+}
 
+// UpdateTodo PATCH - PATCH /api/todos/:id
+func UpdateTodo(ctx *fiber.Ctx) {
+	id := ctx.Params("id")
+
+	body := new(struct {
+		Title       string
+		Description string
+		Done        bool
+	})
+
+	todo := &models.Todo{}
+
+	collection := mgm.Coll(todo)
+
+	err := collection.FindByID(id, todo)
+
+	if err != nil {
+		ctx.Status(500).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
+		})
+		return
+	}
+
+	todo.Title = body.Title
+	todo.Description = body.Description
+	todo.Done = body.Done
+
+	collection.Update(todo)
 }
