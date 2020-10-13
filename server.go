@@ -4,6 +4,8 @@ import (
 	"log"
 	"os"
 
+	"gitHub.com/vertefra/gofiber-todo-api/controllers"
+
 	"github.com/Kamva/mgm/v2"
 	"github.com/gofiber/fiber"
 	"github.com/joho/godotenv"
@@ -33,4 +35,11 @@ func main() {
 
 	app := fiber.New()
 
+	app.Get("/api/todos", controllers.GetAllTodos)
+	app.Get("/api/todos/:id", controllers.GetTodoByID)
+	app.Post("/api/todos", controllers.CreateTodo)
+	app.Patch("/api/todos/:id", controllers.UpdateTodo)
+	app.Delete("/api/todos/:id", controllers.DeleteTodo)
+
+	app.Listen(3000)
 }
