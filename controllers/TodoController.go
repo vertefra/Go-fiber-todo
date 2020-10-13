@@ -134,3 +134,32 @@ func UpdateTodo(ctx *fiber.Ctx) {
 
 	collection.Update(todo)
 }
+
+// DeleteTodo -  DELETE /api/todos/:id
+func DeleteTodo(ctx *fiber.Ctx) {
+	id := ctx.Params("id")
+
+	todo := &models.Todo{}
+	collection := mgm.Coll(todo)
+
+	if err := collection.FindByID(id, todo); err != nil {
+		ctx.Status(500).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if err := collection.Delete(todo); err != nil {
+		ctx.Status(500).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.Status(200).JSON(fiber.Map{
+		"ok":      true,
+		"deleted": todo,
+	})
+}
