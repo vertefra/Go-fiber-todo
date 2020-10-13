@@ -13,7 +13,7 @@ import (
 )
 
 // Init starts the conncetion with mongoDb
-func initMongo() {
+func init() {
 	godotenv.Load()
 	var mongoURI string
 	mongoDb := os.Getenv("MONGO_DB")
@@ -29,6 +29,8 @@ func initMongo() {
 	if err := mgm.SetDefaultConfig(nil, mongoDb, options.Client().ApplyURI(mongoURI)); err != nil {
 		log.Fatal(err)
 	}
+
+	log.Printf("Server Connected to %s", mongoDb)
 }
 
 func main() {
@@ -41,5 +43,9 @@ func main() {
 	app.Patch("/api/todos/:id", controllers.UpdateTodo)
 	app.Delete("/api/todos/:id", controllers.DeleteTodo)
 
-	app.Listen(3000)
+	if err := app.Listen(3000); err != nil {
+		log.Fatal("error in Listen on 3000")
+	} else {
+		log.Println("Server Listening on port 3000")
+	}
 }

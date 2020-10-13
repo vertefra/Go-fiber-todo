@@ -61,6 +61,11 @@ func GetTodoByID(ctx *fiber.Ctx) {
 			"error": err.Error(),
 		})
 	}
+
+	ctx.Status(200).JSON(fiber.Map{
+		"ok":   true,
+		"todo": todo,
+	})
 }
 
 // CreateTodo - POST /api/todos
@@ -114,6 +119,8 @@ func UpdateTodo(ctx *fiber.Ctx) {
 		Done        bool
 	})
 
+	ctx.BodyParser(&body)
+
 	todo := &models.Todo{}
 
 	collection := mgm.Coll(todo)
@@ -128,11 +135,21 @@ func UpdateTodo(ctx *fiber.Ctx) {
 		return
 	}
 
-	todo.Title = body.Title
-	todo.Description = body.Description
-	todo.Done = body.Done
+	if len(body.Title) > 0 || len(body.Description) > 0 || body.Done != todo.Done {
 
-	collection.Update(todo)
+		todo.Title = body.Title
+		todo.Description = body.Description
+		todo.Done = body.Done
+
+		collection.Update(todo)
+
+		ctx.Status(200).JSON(fiber.Map{
+			"ok":      true,
+			"updated": todo,
+		})
+
+	}
+
 }
 
 // DeleteTodo -  DELETE /api/todos/:id
