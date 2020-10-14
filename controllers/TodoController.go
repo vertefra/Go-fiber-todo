@@ -77,6 +77,7 @@ func CreateTodo(ctx *fiber.Ctx) {
 	})
 
 	ctx.BodyParser(&params)
+	userID := ctx.Query("user_id")
 
 	if len(params.Title) == 0 || len(params.Description) == 0 {
 		ctx.Status(400).JSON(fiber.Map{
@@ -86,12 +87,25 @@ func CreateTodo(ctx *fiber.Ctx) {
 		return
 	}
 
+	if len(userID) == 0 {
+		ctx.Status(400).JSON(fiber.Map{
+			"ok":    false,
+			"error": "no user id found",
+		})
+		return
+	}
+
+	// check if the user id is valid
+
+	collection := mgm.Coll(&models.User)
+
 	todo := &models.Todo{
+		UserID:      userID,
 		Title:       params.Title,
 		Description: params.Description,
 	}
 
-	todo = models.CreateTodo(todo.Title, todo.Description)
+	todo = models.CreateTodo(todo.Title, todo.Description, todo.UserID)
 	err := mgm.Coll(todo).Create(todo)
 
 	if err != nil {
