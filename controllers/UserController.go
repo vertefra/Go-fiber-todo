@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 
 	"gitHub.com/vertefra/gofiber-todo-api/models"
 	"github.com/Kamva/mgm/v2"
@@ -27,6 +28,40 @@ func GetAllUsers(c *fiber.Ctx) {
 		"ok":    true,
 		"users": users,
 	})
+}
+
+// Login - POST /api/users/login
+func Login(ctx *fiber.Ctx) {
+
+	body := new(struct {
+		Email    string
+		Password string
+	})
+
+	ctx.BodyParser(&body)
+
+	user := &models.User{}
+
+	log.Println("Logging -> ", body.Email)
+
+	collection := mgm.Coll(user)
+
+	if len(body.Email) == 0 || len(body.Password) == 0 {
+		log.Println("empty fields found")
+		ctx.Status(400).JSON(fiber.Map{
+			"ok":    false,
+			"error": "empty fields",
+		})
+		return
+	}
+
+	if err := collection.SimpleFind(user, bson.M{"email": body.Email}); err != nil {
+		ctx.Status(404).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
+		})
+	}
+
 }
 
 // AddNewUser - POST /api/users/signup

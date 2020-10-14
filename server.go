@@ -41,8 +41,8 @@ func main() {
 
 	app := fiber.New()
 
-	app.Post("/api/users/login")
-	app.Post("/api/users/signup")
+	app.Post("/api/users/login", controllers.Login)
+	// app.Post("/api/users/signup")
 
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: []byte(key),

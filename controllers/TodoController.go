@@ -71,15 +71,15 @@ func GetTodoByID(ctx *fiber.Ctx) {
 // CreateTodo - POST /api/todos
 func CreateTodo(ctx *fiber.Ctx) {
 
-	params := new(struct {
+	body := new(struct {
 		Title       string
 		Description string
 	})
 
-	ctx.BodyParser(&params)
+	ctx.BodyParser(&body)
 	userID := ctx.Query("user_id")
 
-	if len(params.Title) == 0 || len(params.Description) == 0 {
+	if len(body.Title) == 0 || len(body.Description) == 0 {
 		ctx.Status(400).JSON(fiber.Map{
 			"ok":    false,
 			"error": "Empty fields",
@@ -101,8 +101,8 @@ func CreateTodo(ctx *fiber.Ctx) {
 
 	todo := &models.Todo{
 		UserID:      userID,
-		Title:       params.Title,
-		Description: params.Description,
+		Title:       body.Title,
+		Description: body.Description,
 	}
 
 	todo = models.CreateTodo(todo.Title, todo.Description, todo.UserID)
