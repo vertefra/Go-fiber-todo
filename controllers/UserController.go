@@ -1,8 +1,11 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
+	"os"
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
 
 	"gitHub.com/vertefra/gofiber-todo-api/models"
 	"github.com/Kamva/mgm/v2"
@@ -10,24 +13,70 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// GetAllUsers - GET /api/users
-// Returns all the users currently in the database
-func GetAllUsers(c *fiber.Ctx) {
+func authenticate(email string) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+	key := os.Getenv("SECRET")
 
-	collection := mgm.Coll(&models.User{})
-	users := []models.User{}
+	// setting claims
 
-	if err := collection.SimpleFind(&users, bson.D{}); err != nil {
-		c.Status(404).JSON(fiber.Map{
-			"ok":    false,
-			"error": err.Error(),
-		})
+	claims := token.Claims.(jwt.MapClaims)
+	claims["email"] = email
+	claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
+
+	// Generate encoded token
+
+	t, err := token.SignedString([]byte(key))
+
+	if err != nil {
+		return "", err
 	}
 
-	c.Status(200).JSON(fiber.Map{
-		"ok":    true,
-		"users": users,
+	return t, nil
+}
+
+// Signup - POST /api/users/signup
+// Returns all the users currently in the database
+func Signup(ctx *fiber.Ctx) {
+
+	body := new(struct {
+		Email    string
+		Password string
 	})
+
+	ctx.BodyParser(&body)
+	user := &models.User{}
+
+	if err := mgm.Coll(user).SimpleFind(user, bson.M{"email": body.Email}); err != nil {
+
+		// the user does not exist, create the user
+		log.Println(err)
+		user = models.CreateUser(body.Email, body.Password)
+
+		if err = mgm.Coll(user).Create(user); err != nil {
+			ctx.Status(400).JSON(fiber.Map{
+				"ok":    false,
+				"error": err.Error(),
+			})
+			return
+		}
+
+		// the user has been created, let's authenticate
+
+		t, err := authenticate(body.Email)
+
+		if err != nil {
+			ctx.Status(404).JSON(fiber.Map{
+				"ok":    false,
+				"error": err.Error(),
+			})
+		}
+
+		ctx.Status(200).JSON(fiber.Map{
+			"ok":    true,
+			"token": t,
+		})
+
+	}
 }
 
 // Login - POST /api/users/login
@@ -60,19 +109,21 @@ func Login(ctx *fiber.Ctx) {
 			"ok":    false,
 			"error": err.Error(),
 		})
+		return
 	}
 
-}
+	t, err := authenticate(body.Email)
 
-// AddNewUser - POST /api/users/signup
-// create a New User
-func AddNewUser(ctx *fiber.Ctx) {
+	if err != nil {
+		ctx.Status(500).JSON(fiber.Map{
+			"ok":    false,
+			"error": err.Error(),
+		})
+	}
 
-	params := new(struct {
-		Email    string
-		Password string
+	ctx.Status(200).JSON(fiber.Map{
+		"ok":    true,
+		"token": t,
 	})
-
-	fmt.Println(params)
 
 }

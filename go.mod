@@ -6,6 +6,7 @@ require (
 	github.com/Kamva/mgm v1.2.3
 	github.com/Kamva/mgm/v2 v2.0.0
 	github.com/andybalholm/brotli v1.0.1 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gofiber/fiber v1.14.6
 	github.com/gofiber/fiber/v2 v2.0.6
 	github.com/gofiber/jwt v0.2.0
