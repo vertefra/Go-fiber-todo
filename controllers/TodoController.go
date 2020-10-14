@@ -95,9 +95,9 @@ func CreateTodo(ctx *fiber.Ctx) {
 		return
 	}
 
-	// check if the user id is valid
+	// TODO: check if the user id is valid
 
-	collection := mgm.Coll(&models.User)
+	//
 
 	todo := &models.Todo{
 		UserID:      userID,

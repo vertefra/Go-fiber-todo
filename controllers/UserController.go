@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"gitHub.com/vertefra/gofiber-todo-api/models"
 	"github.com/Kamva/mgm/v2"
 	"github.com/gofiber/fiber"
@@ -9,20 +11,33 @@ import (
 
 // GetAllUsers - GET /api/users
 // Returns all the users currently in the database
-func GetAllUsers(ctx *fiber.Ctx) {
+func GetAllUsers(c *fiber.Ctx) {
 
 	collection := mgm.Coll(&models.User{})
 	users := []models.User{}
 
 	if err := collection.SimpleFind(&users, bson.D{}); err != nil {
-		ctx.Status(404).JSON(fiber.Map{
+		c.Status(404).JSON(fiber.Map{
 			"ok":    false,
 			"error": err.Error(),
 		})
 	}
 
-	ctx.Status(200).JSON(fiber.Map{
+	c.Status(200).JSON(fiber.Map{
 		"ok":    true,
 		"users": users,
 	})
+}
+
+// AddNewUser - POST /api/users/signup
+// create a New User
+func AddNewUser(ctx *fiber.Ctx) {
+
+	params := new(struct {
+		Email    string
+		Password string
+	})
+
+	fmt.Println(params)
+
 }
