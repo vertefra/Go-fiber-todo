@@ -3,16 +3,9 @@
         <div class="login-page">
             <div class="form">
                 <!-- @submit.prevent is onClick event listener. Then .prevent prevents page reload. -->
-                <form @submit.prevent="submitForm" class="register-form">
-                    <!-- v-model is a two way input -->
-                    <input type="text" placeholder="email address"/>
-                    <input type="password" placeholder="password"/>
-                    <button>create</button>
-                    <p class="message">Already registered? <a href="#">Sign In</a></p>
-                </form>
-                <form class="login-form">
-                    <input type="text" placeholder="username"/>
-                    <input type="password" placeholder="password"/>
+                <form  @submit.prevent="submitForm">
+                    <input type="text" placeholder="email address" v-model="userEmail"/>
+                    <input type="password" placeholder="password" v-model="userPassword"/>
                     <button>login</button>
                     <!-- TODO LINK THIS TO SIGNUP VIA VUE WAY -->
                     <p class="message">Not registered? <a href="#">Create an account</a></p>
@@ -25,9 +18,18 @@
 <script>
 
 export default {
-    method: {
+    data() {
+        return {
+            userEmail: '',
+            userPassword: ''
+        }
+    },
+    methods: {
         submitForm() {
-
+            console.log("Email: " + this.userEmail),
+            this.userEmail = ""
+            console.log("Password: " + this.userPassword)
+            this.userPassword = ""
         }
     }
 }
@@ -51,7 +53,7 @@ export default {
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
 .form input {
-  font-family: "Roboto", sans-serif;
+  font-family: "monospace", sans-serif;
   outline: 0;
   background: #f2f2f2;
   width: 100%;
@@ -62,7 +64,7 @@ export default {
   font-size: 14px;
 }
 .form button {
-  font-family: "Roboto", sans-serif;
+  font-family: "monospace", sans-serif;
   text-transform: uppercase;
   outline: 0;
   background: #4CAF50;
@@ -71,8 +73,6 @@ export default {
   padding: 15px;
   color: #FFFFFF;
   font-size: 14px;
-  -webkit-transition: all 0.3 ease;
-  transition: all 0.3 ease;
   cursor: pointer;
 }
 .form button:hover,.form button:active,.form button:focus {
@@ -84,43 +84,14 @@ export default {
   font-size: 12px;
 }
 .form .message a {
-  color: #4CAF50;
+  color: blue;
   text-decoration: none;
 }
-.form .register-form {
-  display: none;
-}
-.container {
-  position: relative;
-  z-index: 1;
-  max-width: 300px;
-  margin: 0 auto;
-}
-.container:before, .container:after {
-  content: "";
-  display: block;
-  clear: both;
-}
-.container .info {
-  margin: 50px auto;
-  text-align: center;
-}
-.container .info h1 {
-  margin: 0 0 15px;
-  padding: 0;
-  font-size: 36px;
-  font-weight: 300;
-  color: #1a1a1a;
-}
-.container .info span {
-  color: #4d4d4d;
-  font-size: 12px;
-}
-.container .info span a {
-  color: #000000;
-  text-decoration: none;
-}
-.container .info span .fa {
-  color: #EF3B3A;
-}
+
+
+
+
+
+
+
 </style>
