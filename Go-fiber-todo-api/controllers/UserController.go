@@ -108,11 +108,7 @@ func Login(ctx *fiber.Ctx) {
 
 	ctx.BodyParser(&body)
 
-	user := &models.User{}
-
 	log.Println("Logging -> ", body.Email)
-
-	collection := mgm.Coll(user)
 
 	if len(body.Email) == 0 || len(body.Password) == 0 {
 		log.Println("empty fields found")
@@ -123,7 +119,10 @@ func Login(ctx *fiber.Ctx) {
 		return
 	}
 
-	if err := collection.SimpleFind(user, bson.M{"email": body.Email}); err != nil {
+	user := &models.User{}
+	collection := mgm.Coll(user)
+
+	if err := collection.FindOne(mgm.Ctx(), bson.M{"email": body.Email}).Decode(&user); err != nil {
 		ctx.Status(404).JSON(fiber.Map{
 			"ok":    false,
 			"error": err.Error(),
@@ -131,18 +130,29 @@ func Login(ctx *fiber.Ctx) {
 		return
 	}
 
-	t, err := authenticate(body.Email)
+	// Checking passwords
 
-	if err != nil {
-		ctx.Status(500).JSON(fiber.Map{
-			"ok":    false,
-			"error": err.Error(),
+	if user.Password == body.Password {
+		t, err := authenticate(body.Email)
+
+		if err != nil {
+			ctx.Status(500).JSON(fiber.Map{
+				"ok":    false,
+				"error": err.Error(),
+			})
+		}
+		ctx.Status(200).JSON(fiber.Map{
+			"ok":    true,
+			"token": t,
 		})
+		return
 	}
 
-	ctx.Status(200).JSON(fiber.Map{
-		"ok":    true,
-		"token": t,
+	// passwords dont match
+
+	ctx.Status(404).JSON(fiber.Map{
+		"ok":    false,
+		"error": "wrong password",
 	})
 
 }
