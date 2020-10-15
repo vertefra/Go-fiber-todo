@@ -230,9 +230,9 @@ Signup functionality, requires a body with email and password
 }
 ```
 
-### UpdateTodo - DELETE /api/todos/:id
+### DeleteTodo - DELETE /api/todos/:id
 
-- Deletes a todo obeject with id == :id
+- Deletes a todo object with id == :id
 - **Needs authentication token**
 
 - Response Object
