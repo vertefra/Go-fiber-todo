@@ -61,6 +61,8 @@ func GetTodoByID(ctx *fiber.Ctx) {
 	claims := user.Claims.(jwt.MapClaims)
 	email := claims["email"].(string)
 
+	log.Println("claims --> ", email)
+
 	id := ctx.Params("id")
 
 	todo := &models.Todo{}
@@ -87,6 +89,8 @@ func CreateTodo(ctx *fiber.Ctx) {
 	user := ctx.Locals("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	email := claims["email"].(string)
+
+	log.Println("claims --> ", email)
 
 	body := new(struct {
 		Title       string
@@ -147,6 +151,8 @@ func UpdateTodo(ctx *fiber.Ctx) {
 	claims := user.Claims.(jwt.MapClaims)
 	email := claims["email"].(string)
 
+	log.Println("claims --> ", email)
+
 	id := ctx.Params("id")
 
 	body := new(struct {
@@ -194,6 +200,8 @@ func DeleteTodo(ctx *fiber.Ctx) {
 	user := ctx.Locals("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	email := claims["email"].(string)
+
+	log.Println("claims --> ", email)
 
 	id := ctx.Params("id")
 
