@@ -29,10 +29,12 @@ func GetAllTodos(ctx *fiber.Ctx) {
 
 	userID := ctx.Query("user")
 
+	log.Println("loking for -->", userID)
+
 	collection := mgm.Coll(&models.Todo{})
 	todos := []models.Todo{}
 
-	err := collection.SimpleFind(&todos, bson.M{"UserID": userID})
+	err := collection.SimpleFind(&todos, bson.M{"userID": userID})
 
 	if err != nil {
 		ctx.Status(500).JSON(fiber.Map{

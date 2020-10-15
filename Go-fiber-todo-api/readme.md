@@ -1,6 +1,6 @@
 ## ENDPOINTS
 
-### /api/users/signup
+### Signup - POST /api/users/signup
 
 Signup functionality, requires a body with email and password
 
@@ -42,9 +42,9 @@ Signup functionality, requires a body with email and password
 }
 ```
 
-### /api/users/login
+### Login - POST /api/users/login
 
-Login functionality, requires a body with email or password
+- Login functionality, requires a body with email or password
 
 ```{
 	"email":"verte.fra@gmail.com",
@@ -88,4 +88,47 @@ Login functionality, requires a body with email or password
     "ok": false
 }
 
+```
+
+### GetAllTodos - GET api/todos?user=<userID>
+
+- Returns all the todo objects related to the user with **userID**
+
+- Response object
+
+```{
+    "ok": true,
+    "todos": [
+        {
+            "_id": "5f88a946d5c8c43ef62765d1",
+            "created_at": "2020-10-15T19:55:50.662Z",
+            "updated_at": "2020-10-15T19:55:50.662Z",
+            "userID": "5f888aa3972ec4acade4e707",
+            "title": "first todo",
+            "description": "todo",
+            "done": false
+        }
+    ]
+}
+```
+
+### GetTodoByID - GET api/todos/:id
+
+- Returns a specific todo object with id equal to :id
+
+- Response object
+
+```
+{
+    "ok": true,
+    "todo": {
+        "_id": "5f88a946d5c8c43ef62765d1",
+        "created_at": "2020-10-15T19:55:50.662Z",
+        "updated_at": "2020-10-15T19:55:50.662Z",
+        "userID": "5f888aa3972ec4acade4e707",
+        "title": "first todo",
+        "description": "todo",
+        "done": false
+    }
+}
 ```
