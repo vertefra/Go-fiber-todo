@@ -6,8 +6,11 @@ package controllers
 // defining the imports
 
 import (
+	"log"
+
 	"gitHub.com/vertefra/gofiber-todo-api/models"
 	"github.com/Kamva/mgm/v2"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -17,6 +20,12 @@ import (
 // GetAllTodos - GET /api/todos
 // to our route definitions
 func GetAllTodos(ctx *fiber.Ctx) {
+
+	user := ctx.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	log.Println("claims --> ", email)
 
 	// SimpleFind is a function that takes two arguments:
 	//
