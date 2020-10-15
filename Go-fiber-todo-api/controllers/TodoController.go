@@ -6,27 +6,35 @@ package controllers
 // defining the imports
 
 import (
+	"log"
+
 	"gitHub.com/vertefra/gofiber-todo-api/models"
 	"github.com/Kamva/mgm/v2"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Every controller is a callback function that we pass as a second parameter
 
-// GetAllTodos - GET /api/todos
+// GetAllTodos - GET /api/todos?user=id
 // to our route definitions
 func GetAllTodos(ctx *fiber.Ctx) {
 
-	// SimpleFind is a function that takes two arguments:
-	//
-	// 1- 	memory address of the datastructure where the result
-	//		should be stored (the todos that we created)
-	// 2-	A filter. If filter is empty returns all the entries
+	user := ctx.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	log.Println("claims --> ", email)
+
+	userID := ctx.Query("user")
+
+	log.Println("loking for -->", userID)
 
 	collection := mgm.Coll(&models.Todo{})
 	todos := []models.Todo{}
-	err := collection.SimpleFind(&todos, bson.D{})
+
+	err := collection.SimpleFind(&todos, bson.M{"userID": userID})
 
 	if err != nil {
 		ctx.Status(500).JSON(fiber.Map{
@@ -48,6 +56,12 @@ func GetAllTodos(ctx *fiber.Ctx) {
 // of our collection
 func GetTodoByID(ctx *fiber.Ctx) {
 
+	user := ctx.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	log.Println("claims --> ", email)
+
 	id := ctx.Params("id")
 
 	todo := &models.Todo{}
@@ -68,8 +82,14 @@ func GetTodoByID(ctx *fiber.Ctx) {
 	})
 }
 
-// CreateTodo - POST /api/todos
+// CreateTodo - POST /api/todos?user=id
 func CreateTodo(ctx *fiber.Ctx) {
+
+	user := ctx.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	log.Println("claims --> ", email)
 
 	body := new(struct {
 		Title       string
@@ -77,7 +97,8 @@ func CreateTodo(ctx *fiber.Ctx) {
 	})
 
 	ctx.BodyParser(&body)
-	userID := ctx.Query("user_id")
+
+	userID := ctx.Query("user")
 
 	if len(body.Title) == 0 || len(body.Description) == 0 {
 		ctx.Status(400).JSON(fiber.Map{
@@ -125,6 +146,13 @@ func CreateTodo(ctx *fiber.Ctx) {
 
 // UpdateTodo PATCH - PATCH /api/todos/:id
 func UpdateTodo(ctx *fiber.Ctx) {
+
+	user := ctx.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	log.Println("claims --> ", email)
+
 	id := ctx.Params("id")
 
 	body := new(struct {
@@ -168,6 +196,13 @@ func UpdateTodo(ctx *fiber.Ctx) {
 
 // DeleteTodo -  DELETE /api/todos/:id
 func DeleteTodo(ctx *fiber.Ctx) {
+
+	user := ctx.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	log.Println("claims --> ", email)
+
 	id := ctx.Params("id")
 
 	todo := &models.Todo{}

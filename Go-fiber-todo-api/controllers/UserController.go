@@ -36,7 +36,6 @@ func authenticate(email string) (string, error) {
 }
 
 // Signup - POST /api/users/signup
-// Returns all the users currently in the database
 func Signup(ctx *fiber.Ctx) {
 
 	body := new(struct {
@@ -46,13 +45,32 @@ func Signup(ctx *fiber.Ctx) {
 
 	ctx.BodyParser(&body)
 
+	if len(body.Email) == 0 || len(body.Password) == 0 {
+		log.Println("empty fields found")
+		ctx.Status(400).JSON(fiber.Map{
+			"ok":    false,
+			"error": "empty fields",
+		})
+		return
+	}
+
 	user := &models.User{}
 
-	if foundUser := mgm.Coll(user).FindOne(mgm.Ctx(), bson.M{"email": body.Email}).Decode(&user); foundUser != nil {
+	if err := mgm.Coll(user).FindOne(mgm.Ctx(), bson.M{"email": body.Email}).Decode(&user); err != nil {
+		// error returned from decode
+		log.Println("error from FindOne ==> ", err)
+		return
+	}
+
+	log.Println("User email found => ", user.IDField)
+
+	if user.Email == "" {
 
 		// The user does not exist, create the user
 
-		fmt.Println(&foundUser)
+		log.Println("User email not Found, craeting one")
+
+		fmt.Println(&user)
 
 		user := models.CreateUser(body.Email, body.Password)
 
@@ -66,8 +84,7 @@ func Signup(ctx *fiber.Ctx) {
 
 		// the user has been created, let's authenticate
 
-		t, err := authenticate(body.Email)
-
+		t, err := authenticate(user.Email)
 		if err != nil {
 			ctx.Status(404).JSON(fiber.Map{
 				"ok":    false,
@@ -79,8 +96,14 @@ func Signup(ctx *fiber.Ctx) {
 			"ok":    true,
 			"token": t,
 		})
-
+		return
 	}
+
+	ctx.Status(200).JSON(fiber.Map{
+		"ok":    false,
+		"error": "email already in use",
+		"email": user.Email,
+	})
 
 }
 
@@ -94,11 +117,7 @@ func Login(ctx *fiber.Ctx) {
 
 	ctx.BodyParser(&body)
 
-	user := &models.User{}
-
 	log.Println("Logging -> ", body.Email)
-
-	collection := mgm.Coll(user)
 
 	if len(body.Email) == 0 || len(body.Password) == 0 {
 		log.Println("empty fields found")
@@ -109,7 +128,10 @@ func Login(ctx *fiber.Ctx) {
 		return
 	}
 
-	if err := collection.SimpleFind(user, bson.M{"email": body.Email}); err != nil {
+	user := &models.User{}
+	collection := mgm.Coll(user)
+
+	if err := collection.FindOne(mgm.Ctx(), bson.M{"email": body.Email}).Decode(&user); err != nil {
 		ctx.Status(404).JSON(fiber.Map{
 			"ok":    false,
 			"error": err.Error(),
@@ -117,18 +139,30 @@ func Login(ctx *fiber.Ctx) {
 		return
 	}
 
-	t, err := authenticate(body.Email)
+	// Checking passwords
 
-	if err != nil {
-		ctx.Status(500).JSON(fiber.Map{
-			"ok":    false,
-			"error": err.Error(),
+	if user.Password == body.Password {
+		t, err := authenticate(body.Email)
+
+		if err != nil {
+			ctx.Status(500).JSON(fiber.Map{
+				"ok":    false,
+				"error": err.Error(),
+			})
+		}
+		ctx.Status(200).JSON(fiber.Map{
+			"ok":     true,
+			"userID": user.IDField,
+			"token":  t,
 		})
+		return
 	}
 
-	ctx.Status(200).JSON(fiber.Map{
-		"ok":    true,
-		"token": t,
+	// passwords dont match
+
+	ctx.Status(404).JSON(fiber.Map{
+		"ok":    false,
+		"error": "wrong password",
 	})
 
 }
