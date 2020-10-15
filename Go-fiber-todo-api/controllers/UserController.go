@@ -48,11 +48,20 @@ func Signup(ctx *fiber.Ctx) {
 
 	user := &models.User{}
 
-	if foundUser := mgm.Coll(user).FindOne(mgm.Ctx(), bson.M{"email": body.Email}).Decode(&user); foundUser != nil {
+	if err := mgm.Coll(user).FindOne(mgm.Ctx(), bson.M{"email": body.Email}).Decode(&user); err != nil {
+		// error returned from decode
+		log.Println("error from FindOne ==> ", err)
+	}
+
+	log.Println("User email found => ", user.Email)
+
+	if user.Email == "" {
 
 		// The user does not exist, create the user
 
-		fmt.Println(&foundUser)
+		log.Println("User email not Found, craeting one")
+
+		fmt.Println(&user)
 
 		user := models.CreateUser(body.Email, body.Password)
 
@@ -67,7 +76,6 @@ func Signup(ctx *fiber.Ctx) {
 		// the user has been created, let's authenticate
 
 		t, err := authenticate(body.Email)
-
 		if err != nil {
 			ctx.Status(404).JSON(fiber.Map{
 				"ok":    false,
@@ -79,8 +87,14 @@ func Signup(ctx *fiber.Ctx) {
 			"ok":    true,
 			"token": t,
 		})
-
+		return
 	}
+
+	ctx.Status(200).JSON(fiber.Map{
+		"ok":    false,
+		"error": "email already in use",
+		"email": user.Email,
+	})
 
 }
 
