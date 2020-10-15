@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -44,15 +45,18 @@ func Signup(ctx *fiber.Ctx) {
 	})
 
 	ctx.BodyParser(&body)
+
 	user := &models.User{}
 
-	if err := mgm.Coll(user).SimpleFind(user, bson.M{"email": body.Email}); err != nil {
+	if foundUser := mgm.Coll(user).FindOne(mgm.Ctx(), bson.M{"email": body.Email}).Decode(&user); foundUser != nil {
 
-		// the user does not exist, create the user
-		log.Println(err)
-		user = models.CreateUser(body.Email, body.Password)
+		// The user does not exist, create the user
 
-		if err = mgm.Coll(user).Create(user); err != nil {
+		fmt.Println(&foundUser)
+
+		user := models.CreateUser(body.Email, body.Password)
+
+		if err := mgm.Coll(user).Create(user); err != nil {
 			ctx.Status(400).JSON(fiber.Map{
 				"ok":    false,
 				"error": err.Error(),
@@ -77,6 +81,7 @@ func Signup(ctx *fiber.Ctx) {
 		})
 
 	}
+
 }
 
 // Login - POST /api/users/login
