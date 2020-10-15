@@ -36,7 +36,6 @@ func authenticate(email string) (string, error) {
 }
 
 // Signup - POST /api/users/signup
-// Returns all the users currently in the database
 func Signup(ctx *fiber.Ctx) {
 
 	body := new(struct {
@@ -46,14 +45,24 @@ func Signup(ctx *fiber.Ctx) {
 
 	ctx.BodyParser(&body)
 
+	if len(body.Email) == 0 || len(body.Password) == 0 {
+		log.Println("empty fields found")
+		ctx.Status(400).JSON(fiber.Map{
+			"ok":    false,
+			"error": "empty fields",
+		})
+		return
+	}
+
 	user := &models.User{}
 
 	if err := mgm.Coll(user).FindOne(mgm.Ctx(), bson.M{"email": body.Email}).Decode(&user); err != nil {
 		// error returned from decode
 		log.Println("error from FindOne ==> ", err)
+		return
 	}
 
-	log.Println("User email found => ", user.Email)
+	log.Println("User email found => ", user.IDField)
 
 	if user.Email == "" {
 
@@ -75,7 +84,7 @@ func Signup(ctx *fiber.Ctx) {
 
 		// the user has been created, let's authenticate
 
-		t, err := authenticate(body.Email)
+		t, err := authenticate(user.Email)
 		if err != nil {
 			ctx.Status(404).JSON(fiber.Map{
 				"ok":    false,
@@ -142,8 +151,9 @@ func Login(ctx *fiber.Ctx) {
 			})
 		}
 		ctx.Status(200).JSON(fiber.Map{
-			"ok":    true,
-			"token": t,
+			"ok":     true,
+			"userID": user.IDField,
+			"token":  t,
 		})
 		return
 	}

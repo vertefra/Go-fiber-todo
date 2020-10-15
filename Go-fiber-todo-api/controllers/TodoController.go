@@ -17,7 +17,7 @@ import (
 
 // Every controller is a callback function that we pass as a second parameter
 
-// GetAllTodos - GET /api/todos
+// GetAllTodos - GET /api/todos?user=id
 // to our route definitions
 func GetAllTodos(ctx *fiber.Ctx) {
 
@@ -27,15 +27,12 @@ func GetAllTodos(ctx *fiber.Ctx) {
 
 	log.Println("claims --> ", email)
 
-	// SimpleFind is a function that takes two arguments:
-	//
-	// 1- 	memory address of the datastructure where the result
-	//		should be stored (the todos that we created)
-	// 2-	A filter. If filter is empty returns all the entries
+	userID := ctx.Query("user")
 
 	collection := mgm.Coll(&models.Todo{})
 	todos := []models.Todo{}
-	err := collection.SimpleFind(&todos, bson.D{})
+
+	err := collection.SimpleFind(&todos, bson.M{"UserID": userID})
 
 	if err != nil {
 		ctx.Status(500).JSON(fiber.Map{
@@ -83,7 +80,7 @@ func GetTodoByID(ctx *fiber.Ctx) {
 	})
 }
 
-// CreateTodo - POST /api/todos
+// CreateTodo - POST /api/todos?user=id
 func CreateTodo(ctx *fiber.Ctx) {
 
 	user := ctx.Locals("user").(*jwt.Token)
@@ -98,7 +95,8 @@ func CreateTodo(ctx *fiber.Ctx) {
 	})
 
 	ctx.BodyParser(&body)
-	userID := ctx.Query("user_id")
+
+	userID := ctx.Query("user")
 
 	if len(body.Title) == 0 || len(body.Description) == 0 {
 		ctx.Status(400).JSON(fiber.Map{
