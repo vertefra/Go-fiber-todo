@@ -1,8 +1,7 @@
 <template>
     <div>
         <section>
-            <ul>words</ul>
-            <login-page></login-page>
+            <router-view></router-view>
         </section>
     </div>
 </template>

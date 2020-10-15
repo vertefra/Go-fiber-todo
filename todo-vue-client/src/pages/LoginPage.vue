@@ -35,7 +35,7 @@ export default {
     }
 }
 </script>
-
+<!-- scoped basically means that these styles are only located on this component. -->
 <style scoped>
 
 .login-page {
