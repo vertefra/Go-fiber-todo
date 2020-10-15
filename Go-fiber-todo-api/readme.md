@@ -4,15 +4,17 @@
 
 Signup functionality, requires a body with email and password
 
-```{
+```
+{
 	"email":"verte.fra@gmail.com",
 	"password":"verte"
-    }
+}
 ```
 
 **response object**
 
-```{
+```
+{
     "ok": true,
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZlcnRlLmZyYUBnbWFpbC5jb20iLCJleHAiOjE2MDI3OTUwNDh9.yyKhnuI-95rMWIkb_f1mG8O9iPs8oaqjmO082SDAJWw",
     "userID": {
@@ -27,7 +29,8 @@ Signup functionality, requires a body with email and password
 
 - If the email is already in use
 
-```{
+```
+{
     "email": "verte.fra@gmail.com",
     "error": "email already in use",
     "ok": false
@@ -36,7 +39,8 @@ Signup functionality, requires a body with email and password
 
 - email or password field empty
 
-```{
+```
+{
     "error": "empty fields",
     "ok": false
 }
@@ -46,15 +50,17 @@ Signup functionality, requires a body with email and password
 
 - Login functionality, requires a body with email or password
 
-```{
+```
+{
 	"email":"verte.fra@gmail.com",
 	"password":"verte"
-    }
+}
 ```
 
 **response object**
 
-```{
+```
+{
     "ok": true,
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZlcnRlLmZyYUBnbWFpbC5jb20iLCJleHAiOjE2MDI3OTUwNDh9.yyKhnuI-95rMWIkb_f1mG8O9iPs8oaqjmO082SDAJWw",
     "userID": {
@@ -67,7 +73,8 @@ Signup functionality, requires a body with email and password
 
 - Email or password field empty
 
-```{
+```
+{
     "error": "empty fields",
     "ok": false
 }
@@ -75,7 +82,8 @@ Signup functionality, requires a body with email and password
 
 - Email not found
 
-```{
+```
+{
     "error": "mongo: no documents in result",
     "ok": false
 }
@@ -83,20 +91,22 @@ Signup functionality, requires a body with email and password
 
 - Wrong password
 
-```{
+```
+{
     "error": "wrong password",
     "ok": false
 }
 
 ```
 
-### GetAllTodos - GET api/todos?user=<userID>
+### GetAllTodos - GET api/todos?user=userID
 
 - Returns all the todo objects related to the user with **userID**
 
 - Response object
 
-```{
+```
+{
     "ok": true,
     "todos": [
         {
