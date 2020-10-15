@@ -1,14 +1,15 @@
 <template>
     <div>
-        <div class="login-page">
+        <div class="signup-page">
             <div class="form">
                 <!-- @submit.prevent is onClick event listener. Then .prevent prevents page reload. -->
                 <form  @submit.prevent="submitForm">
+                    <!-- v-model works as a two way information path. userEmail data goes in and we can return a empty string back into it. Reference data & methods -->
                     <input type="text" placeholder="email address" v-model="userEmail"/>
                     <input type="password" placeholder="password" v-model="userPassword"/>
-                    <button>login</button>
+                    <button>signup</button>
                     <!-- TODO LINK THIS TO SIGNUP VIA VUE WAY -->
-                    <p class="message">Not registered? <a href="#">Create an account</a></p>
+                    <p class="message">Forgot password? <a href="#">New Password</a></p>
                 </form>
             </div>
         </div>
@@ -26,7 +27,7 @@ export default {
     },
     methods: {
         submitForm() {
-            console.log("Email: " + this.userEmail),
+            console.log("Email: " + this.userEmail)
             this.userEmail = ""
             console.log("Password: " + this.userPassword)
             this.userPassword = ""
@@ -37,7 +38,7 @@ export default {
 
 <style scoped>
 
-.login-page {
+.signup-page {
   width: 360px;
   padding: 8% 0 0;
   margin: auto;
