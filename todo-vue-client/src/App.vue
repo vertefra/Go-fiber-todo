@@ -1,8 +1,8 @@
 <template>
     <div>
         <section>
-            <ul>words</ul>
-            <login-page></login-page>
+            <!-- this is how we navigate with the routers! -->
+            <router-view></router-view>
         </section>
     </div>
 </template>
