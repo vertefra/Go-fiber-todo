@@ -252,6 +252,8 @@ Signup functionality, requires a body with email and password
 }
 ```
 
+LIVE DEPLOYEMENT [https://go-vue-backend.herokuapp.com/]
+
 Next things todo:
 
 - Converting ObjectID into string and send id in token

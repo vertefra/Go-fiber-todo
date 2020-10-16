@@ -46,6 +46,10 @@ func main() {
 	app.Post("/api/users/login", controllers.Login)
 	app.Post("/api/users/signup", controllers.Signup)
 
+	app.Get("/", func(ctx *fiber.Ctx) {
+		ctx.Status(200).Send("Go API engine v0.0.2 \n See documentation at https://github.com/vertefra/Go-fiber-todo/tree/master/Go-fiber-todo-api")
+	})
+
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: []byte(key),
 	}))
