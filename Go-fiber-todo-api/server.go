@@ -14,6 +14,7 @@ import (
 )
 
 var key string
+var port string
 
 // Init starts the conncetion with mongoDb
 func init() {
@@ -23,6 +24,7 @@ func init() {
 	mongoUsr := os.Getenv("MONGO_USR")
 	mongoPsw := os.Getenv("MONGO_PSW")
 	key = os.Getenv("SECRET")
+	port = os.Getenv("PORT")
 
 	if len(mongoDb) == 0 || len(mongoUsr) == 0 || len(mongoPsw) == 0 {
 		mongoURI = "mongodb://localhost:27017"
@@ -54,9 +56,9 @@ func main() {
 	app.Patch("/api/todos/:id", controllers.UpdateTodo)
 	app.Delete("/api/todos/:id", controllers.DeleteTodo)
 
-	if err := app.Listen(":3000"); err != nil {
-		log.Fatal("error in Listen on 3000")
+	if err := app.Listen(":" + port); err != nil {
+		log.Fatal("error in Listen on, ", port)
 	} else {
-		log.Println("Server Listening on port 3000")
+		log.Println("Server Listening on port: ", port)
 	}
 }
